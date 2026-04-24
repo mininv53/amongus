@@ -10,7 +10,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 load_dotenv()
 
-app = FastAPI(title="TruthLens API", version="1.0.0")
+app = FastAPI(title="DeepGuard API", version="1.0.0")
 
 # CORS
 app.add_middleware(
@@ -23,7 +23,7 @@ app.add_middleware(
 
 # MongoDB
 MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
-DB_NAME = os.environ.get('DB_NAME', 'truthlens')
+DB_NAME = os.environ.get('DB_NAME', 'deepguard')
 client = AsyncIOMotorClient(MONGO_URL)
 db = client[DB_NAME]
 analyses_collection = db['analyses']
@@ -63,7 +63,7 @@ class ContactRequest(BaseModel):
 
 @app.get("/api/health")
 async def health_check():
-    return {"status": "ok", "service": "TruthLens API", "version": "1.0.0"}
+    return {"status": "ok", "service": "DeepGuard API", "version": "1.0.0"}
 
 
 @app.post("/api/analyze/image")

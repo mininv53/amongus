@@ -104,7 +104,7 @@ export default function Enterprise() {
 {`import requests
 
 response = requests.post(
-    "https://api.truthlens.ai/v1/analyze",
+    "https://api.deepguard.ai/v1/analyze",
     headers={
         "Authorization": "Bearer YOUR_API_KEY",
         "Content-Type": "application/json"

@@ -26,7 +26,7 @@ export const Navbar = () => {
             <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
               <Shield className="w-4 h-4 text-primary" />
             </div>
-            <span className="text-lg font-semibold tracking-tight font-['Space_Grotesk']">TruthLens</span>
+            <span className="text-lg font-semibold tracking-tight font-['Space_Grotesk']">DeepGuard</span>
           </Link>
 
           {/* Desktop nav */}

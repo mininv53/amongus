@@ -16,7 +16,7 @@ export const Footer = () => {
               <div className="w-7 h-7 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center">
                 <Shield className="w-3.5 h-3.5 text-primary" />
               </div>
-              <span className="font-semibold font-['Space_Grotesk']">TruthLens</span>
+              <span className="font-semibold font-['Space_Grotesk']">DeepGuard</span>
             </div>
             <p className="text-sm text-muted-foreground">{t('footer_tagline')}</p>
           </div>
@@ -31,7 +31,7 @@ export const Footer = () => {
 
         <div className="mt-6 pt-4 border-t border-border">
           <p className="text-xs text-muted-foreground text-center">
-            &copy; {new Date().getFullYear()} TruthLens
+            &copy; {new Date().getFullYear()} DeepGuard
           </p>
         </div>
       </div>
