@@ -1,34 +1,89 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* TruthLens App Styles */
+
+/* Hero gradient overlay */
+.hero-gradient {
+  background: radial-gradient(900px circle at 20% 10%, rgba(20, 184, 166, 0.18), transparent 55%),
+              radial-gradient(700px circle at 80% 20%, rgba(132, 204, 22, 0.10), transparent 60%);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+/* Scanner sheen animation */
+@keyframes scannerSheen {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+.scanner-sheen {
+  animation: scannerSheen 2s ease-in-out infinite;
 }
 
-.App-link {
-    color: #61dafb;
+/* Trust score gauge animation */
+@keyframes gaugeReveal {
+  from { stroke-dashoffset: 283; }
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+.gauge-circle {
+  animation: gaugeReveal 1.5s ease-out forwards;
+}
+
+/* Glow effects */
+.glow-teal {
+  box-shadow: 0 0 0 1px rgba(20,184,166,0.25), 0 18px 60px rgba(20,184,166,0.10);
+}
+
+.glow-teal-hover:hover {
+  box-shadow: 0 0 0 1px rgba(20,184,166,0.4), 0 18px 60px rgba(20,184,166,0.15);
+}
+
+/* Dropzone styles */
+.dropzone-active {
+  border-color: hsl(168 78% 45%);
+  background: hsl(168 78% 45% / 0.05);
+}
+
+/* Signal impact colors */
+.signal-positive { color: hsl(150 70% 45%); }
+.signal-negative { color: hsl(0 78% 55%); }
+.signal-neutral { color: hsl(38 92% 55%); }
+
+/* Smooth page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+/* Active button press */
+.btn-press:active {
+  transform: scale(0.98);
+}
+
+/* Tab underline slide */
+.tab-active-line {
+  transition: left 0.3s ease, width 0.3s ease;
+}
+
+/* Bento card hover */
+.bento-card {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.bento-card:hover {
+  border-color: hsl(168 78% 45% / 0.3);
+  box-shadow: 0 0 0 1px rgba(20,184,166,0.15), 0 12px 40px rgba(0,0,0,0.2);
+}
+
+/* Pricing card highlight */
+.pricing-highlight {
+  border-color: hsl(168 78% 45%);
+  box-shadow: 0 0 0 1px rgba(20,184,166,0.3), 0 24px 80px rgba(20,184,166,0.12);
+}
+
+/* Skeleton loading */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, transparent, rgba(20,184,166,0.08), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }
