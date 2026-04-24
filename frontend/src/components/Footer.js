@@ -8,11 +8,11 @@ export const Footer = () => {
 
   return (
     <footer className="border-t border-border bg-card/50" data-testid="footer">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-10">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           {/* Brand */}
-          <div className="md:col-span-1">
-            <div className="flex items-center gap-2 mb-3">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
               <div className="w-7 h-7 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center">
                 <Shield className="w-3.5 h-3.5 text-primary" />
               </div>
@@ -21,40 +21,17 @@ export const Footer = () => {
             <p className="text-sm text-muted-foreground">{t('footer_tagline')}</p>
           </div>
 
-          {/* Product */}
-          <div>
-            <h4 className="text-sm font-semibold mb-3">{t('footer_product')}</h4>
-            <div className="space-y-2">
-              <Link to="/analyze" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">{t('nav_analyze')}</Link>
-              <Link to="/dashboard" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">{t('nav_dashboard')}</Link>
-              <Link to="/enterprise" className="block text-sm text-muted-foreground hover:text-foreground transition-colors">API</Link>
-            </div>
-          </div>
-
-          {/* Company */}
-          <div>
-            <h4 className="text-sm font-semibold mb-3">{t('footer_company')}</h4>
-            <div className="space-y-2">
-              <span className="block text-sm text-muted-foreground">About</span>
-              <span className="block text-sm text-muted-foreground">Blog</span>
-              <span className="block text-sm text-muted-foreground">Careers</span>
-            </div>
-          </div>
-
-          {/* Legal */}
-          <div>
-            <h4 className="text-sm font-semibold mb-3">{t('footer_legal')}</h4>
-            <div className="space-y-2">
-              <span className="block text-sm text-muted-foreground">Privacy Policy</span>
-              <span className="block text-sm text-muted-foreground">Terms of Service</span>
-              <span className="block text-sm text-muted-foreground">Cookie Policy</span>
-            </div>
+          {/* Nav links */}
+          <div className="flex flex-wrap gap-6">
+            <Link to="/analyze" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('nav_analyze')}</Link>
+            <Link to="/dashboard" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t('nav_dashboard')}</Link>
+            <Link to="/enterprise" className="text-sm text-muted-foreground hover:text-foreground transition-colors">API</Link>
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-border">
+        <div className="mt-6 pt-4 border-t border-border">
           <p className="text-xs text-muted-foreground text-center">
-            &copy; {new Date().getFullYear()} TruthLens. All rights reserved.
+            &copy; {new Date().getFullYear()} TruthLens
           </p>
         </div>
       </div>

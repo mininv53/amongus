@@ -1,18 +1,22 @@
 [
   {
-    "content": "Phase 3: Implement multi-model analysis engine (GPT-5.1 + Claude Sonnet 4.5 + Gemini 2.5 Pro)",
+    "content": "Add Romanian language (ro) to i18n",
     "status": "completed"
   },
   {
-    "content": "Phase 3: Update frontend to show multi-model consensus UI",
+    "content": "Change Pro price from $29 to $15",
     "status": "completed"
   },
   {
-    "content": "Phase 3: Remove 'Made with Emergent' badge",
+    "content": "Remove 'Used by teams' fake social proof section",
     "status": "completed"
   },
   {
-    "content": "Phase 3: End to End Testing",
+    "content": "Remove AI-design traces: fake footer links, generic placeholders, make it feel real",
+    "status": "completed"
+  },
+  {
+    "content": "Add RO to language toggle (3-way: EN/RU/RO)",
     "status": "completed"
   }
 ]

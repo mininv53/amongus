@@ -121,19 +121,7 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Social proof */}
-        <div className="border-t border-border/50">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 py-6">
-            <p className="text-xs text-muted-foreground text-center mb-4">Used by teams fighting misinformation</p>
-            <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground font-medium">
-              <span className="opacity-50">Media Ops</span>
-              <span className="opacity-50">Trust & Safety</span>
-              <span className="opacity-50">SOC Teams</span>
-              <span className="opacity-50">Newsrooms</span>
-              <span className="opacity-50">Research Labs</span>
-            </div>
-          </div>
-        </div>
+        {/* Social proof - removed for clean prototype look */}
       </section>
 
       {/* Features */}

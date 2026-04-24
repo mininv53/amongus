@@ -4,7 +4,7 @@ import { useLanguage } from '../i18n';
 import { Menu, X, Shield } from 'lucide-react';
 
 export const Navbar = () => {
-  const { t, lang, toggleLang } = useLanguage();
+  const { t, lang, cycleLang, nextLangLabel } = useLanguage();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -51,11 +51,11 @@ export const Navbar = () => {
           <div className="flex items-center gap-3">
             {/* Language toggle */}
             <button
-              onClick={toggleLang}
+              onClick={cycleLang}
               data-testid="language-toggle"
               className="px-2.5 py-1.5 text-xs font-medium rounded-md border border-border hover:border-primary/50 transition-colors text-muted-foreground hover:text-foreground"
             >
-              {lang === 'en' ? 'RU' : 'EN'}
+              {nextLangLabel()}
             </button>
 
             {/* CTA */}
