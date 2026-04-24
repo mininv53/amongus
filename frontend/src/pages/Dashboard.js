@@ -14,26 +14,29 @@ export default function Dashboard() {
   const [filter, setFilter] = useState('all');
 
   useEffect(() => {
-    fetchData();
-  }, [filter]);
-
-  const fetchData = async () => {
+    let cancelled = false;
+    const fetchData = async () => {
+      try {
+        const [statsRes, analysesRes] = await Promise.all([
+          fetch(`${API_URL}/api/stats`),
+          fetch(`${API_URL}/api/analyses/recent?limit=50${filter !== 'all' ? `&analysis_type=${filter}` : ''}`)
+        ]);
+        if (cancelled) return;
+        const statsData = await statsRes.json();
+        const analysesData = await analysesRes.json();
+        if (cancelled) return;
+        setStats(statsData);
+        setAnalyses(analysesData.analyses || []);
+      } catch (error) {
+        if (!cancelled) console.error('Failed to fetch dashboard data:', error);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
     setLoading(true);
-    try {
-      const [statsRes, analysesRes] = await Promise.all([
-        fetch(`${API_URL}/api/stats`),
-        fetch(`${API_URL}/api/analyses/recent?limit=50${filter !== 'all' ? `&analysis_type=${filter}` : ''}`)
-      ]);
-      const statsData = await statsRes.json();
-      const analysesData = await analysesRes.json();
-      setStats(statsData);
-      setAnalyses(analysesData.analyses || []);
-    } catch (error) {
-      console.error('Failed to fetch dashboard data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchData();
+    return () => { cancelled = true; };
+  }, [filter]);
 
   const getTypeIcon = (type) => {
     switch (type) {
