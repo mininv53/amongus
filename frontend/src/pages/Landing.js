@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../i18n';
 import { motion } from 'framer-motion';
-import { Shield, Image, Music, Link2, Search, Share2, Globe, ArrowRight, Check, AlertTriangle, Layers } from 'lucide-react';
+import { Shield, Image, Music, Link2, Search, Share2, ArrowRight, AlertTriangle, Layers } from 'lucide-react';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -178,12 +178,9 @@ export default function Landing() {
           </div>
           {/* Disclaimer */}
           <div className="max-w-xl mx-auto p-4 rounded-xl border border-amber-500/20 bg-amber-500/5">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
-              <div>
-                <h4 className="text-sm font-semibold text-amber-400 mb-1">{t('how_disclaimer')}</h4>
-                <p className="text-xs text-muted-foreground leading-relaxed">{t('how_disclaimer_text')}</p>
-              </div>
+            <div>
+              <h4 className="text-sm font-semibold text-amber-400 mb-1">{t('how_disclaimer')}</h4>
+              <p className="text-xs text-muted-foreground leading-relaxed">{t('how_disclaimer_text')}</p>
             </div>
           </div>
         </div>
@@ -206,8 +203,7 @@ export default function Landing() {
               </div>
               <ul className="space-y-2.5 mb-6">
                 {[t('pricing_free_f1'), t('pricing_free_f2'), t('pricing_free_f3'), t('pricing_free_f4')].map((f, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Check className="w-4 h-4 text-primary shrink-0" />
+                  <li key={i} className="text-sm text-muted-foreground">
                     {f}
                   </li>
                 ))}
@@ -229,8 +225,7 @@ export default function Landing() {
               </div>
               <ul className="space-y-2.5 mb-6">
                 {[t('pricing_pro_f1'), t('pricing_pro_f2'), t('pricing_pro_f3'), t('pricing_pro_f4'), t('pricing_pro_f5')].map((f, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Check className="w-4 h-4 text-primary shrink-0" />
+                  <li key={i} className="text-sm text-muted-foreground">
                     {f}
                   </li>
                 ))}
@@ -249,8 +244,7 @@ export default function Landing() {
               </div>
               <ul className="space-y-2.5 mb-6">
                 {[t('pricing_enterprise_f1'), t('pricing_enterprise_f2'), t('pricing_enterprise_f3'), t('pricing_enterprise_f4'), t('pricing_enterprise_f5')].map((f, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Check className="w-4 h-4 text-primary shrink-0" />
+                  <li key={i} className="text-sm text-muted-foreground">
                     {f}
                   </li>
                 ))}

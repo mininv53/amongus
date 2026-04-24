@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../i18n';
-import { Shield } from 'lucide-react';
 
 export const Footer = () => {
   const { t } = useLanguage();
@@ -12,10 +11,12 @@ export const Footer = () => {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           {/* Brand */}
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-7 h-7 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center">
-                <Shield className="w-3.5 h-3.5 text-primary" />
-              </div>
+            <div className="flex items-center gap-2.5 mb-2">
+              <img
+                src="/logo.jpg"
+                alt="DeepGuard"
+                className="w-8 h-8 rounded-lg object-cover"
+              />
               <span className="font-semibold font-['Space_Grotesk']">DeepGuard</span>
             </div>
             <p className="text-sm text-muted-foreground">{t('footer_tagline')}</p>

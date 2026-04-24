@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../i18n';
-import { Menu, X, Shield } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 export const Navbar = () => {
   const { t, lang, cycleLang, nextLangLabel } = useLanguage();
@@ -22,10 +22,12 @@ export const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group" data-testid="nav-logo">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-              <Shield className="w-4 h-4 text-primary" />
-            </div>
+          <Link to="/" className="flex items-center gap-2.5 group" data-testid="nav-logo">
+            <img
+              src="/logo.jpg"
+              alt="DeepGuard"
+              className="w-9 h-9 rounded-lg object-cover"
+            />
             <span className="text-lg font-semibold tracking-tight font-['Space_Grotesk']">DeepGuard</span>
           </Link>
 
