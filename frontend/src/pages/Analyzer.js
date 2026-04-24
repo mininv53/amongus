@@ -5,6 +5,7 @@ import { Image, Music, Link2, Loader2, ArrowRight, Share2, Copy, RotateCcw, Info
 import TrustScoreGauge from '../components/TrustScoreGauge';
 import SignalBreakdown from '../components/SignalBreakdown';
 import DropzoneUpload from '../components/DropzoneUpload';
+import ModelConsensus from '../components/ModelConsensus';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
@@ -18,10 +19,11 @@ export default function Analyzer() {
   const [currentStep, setCurrentStep] = useState(0);
 
   const analysisSteps = [
-    { label: lang === 'ru' ? 'Загрузка файла...' : 'Uploading file...' },
-    { label: lang === 'ru' ? 'Извлечение данных...' : 'Extracting data...' },
-    { label: lang === 'ru' ? 'AI анализ...' : 'AI analysis...' },
-    { label: lang === 'ru' ? 'Формирование отчёта...' : 'Generating report...' },
+    { label: lang === 'ru' ? 'Загрузка файла...' : 'Uploading content...' },
+    { label: lang === 'ru' ? 'GPT-5.1 анализ...' : 'GPT-5.1 analysis...' },
+    { label: lang === 'ru' ? 'Claude Sonnet 4.5 анализ...' : 'Claude Sonnet 4.5 analysis...' },
+    { label: lang === 'ru' ? 'Gemini 2.5 Pro анализ...' : 'Gemini 2.5 Pro analysis...' },
+    { label: lang === 'ru' ? 'Консенсус моделей...' : 'Multi-model consensus...' },
   ];
 
   const handleAnalyze = useCallback(async () => {
@@ -34,8 +36,8 @@ export default function Analyzer() {
 
       // Step animation
       const stepInterval = setInterval(() => {
-        setCurrentStep(prev => Math.min(prev + 1, 3));
-      }, 3000);
+        setCurrentStep(prev => Math.min(prev + 1, 4));
+      }, 4000);
 
       if (activeTab === 'image' || activeTab === 'audio') {
         if (!selectedFile) {
@@ -67,7 +69,7 @@ export default function Analyzer() {
       }
 
       clearInterval(stepInterval);
-      setCurrentStep(3);
+      setCurrentStep(4);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -259,6 +261,18 @@ export default function Analyzer() {
               </div>
             </div>
           </div>
+
+          {/* Multi-Model Consensus */}
+          {result.model_results && result.model_results.length > 0 && (
+            <div className="p-6 rounded-2xl border border-border bg-card">
+              <ModelConsensus
+                modelResults={result.model_results}
+                consensusStrength={result.consensus_strength}
+                modelsUsed={result.models_used}
+                modelsTotal={result.models_total}
+              />
+            </div>
+          )}
 
           {/* Signals */}
           <div className="p-6 rounded-2xl border border-border bg-card">

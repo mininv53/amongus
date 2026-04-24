@@ -4,6 +4,7 @@ import { useLanguage } from '../i18n';
 import { Loader2, ArrowLeft, Clock, FileType, AlertTriangle } from 'lucide-react';
 import TrustScoreGauge from '../components/TrustScoreGauge';
 import SignalBreakdown from '../components/SignalBreakdown';
+import ModelConsensus from '../components/ModelConsensus';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL || '';
 
@@ -106,6 +107,18 @@ export default function SharedResult() {
           </div>
         </div>
       </div>
+
+      {/* Multi-Model Consensus */}
+      {result.model_results && result.model_results.length > 0 && (
+        <div className="p-6 rounded-2xl border border-border bg-card mb-6">
+          <ModelConsensus
+            modelResults={result.model_results}
+            consensusStrength={result.consensus_strength}
+            modelsUsed={result.models_used}
+            modelsTotal={result.models_total}
+          />
+        </div>
+      )}
 
       {/* Signals */}
       <div className="p-6 rounded-2xl border border-border bg-card mb-6">

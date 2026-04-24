@@ -101,6 +101,10 @@ async def analyze_image_endpoint(
             "top_signals": result.get('top_signals', []),
             "summary": result.get('summary', ''),
             "recommendations": result.get('recommendations', []),
+            "model_results": result.get('model_results', []),
+            "models_used": result.get('models_used', 0),
+            "models_total": result.get('models_total', 0),
+            "consensus_strength": result.get('consensus_strength', ''),
             "language": language,
             "created_at": datetime.now(timezone.utc)
         }
@@ -143,6 +147,10 @@ async def analyze_audio_endpoint(
             "top_signals": result.get('top_signals', []),
             "summary": result.get('summary', ''),
             "recommendations": result.get('recommendations', []),
+            "model_results": result.get('model_results', []),
+            "models_used": result.get('models_used', 0),
+            "models_total": result.get('models_total', 0),
+            "consensus_strength": result.get('consensus_strength', ''),
             "language": language,
             "created_at": datetime.now(timezone.utc)
         }
@@ -175,6 +183,10 @@ async def analyze_url_endpoint(request: URLAnalysisRequest):
             "top_signals": result.get('top_signals', []),
             "summary": result.get('summary', ''),
             "recommendations": result.get('recommendations', []),
+            "model_results": result.get('model_results', []),
+            "models_used": result.get('models_used', 0),
+            "models_total": result.get('models_total', 0),
+            "consensus_strength": result.get('consensus_strength', ''),
             "language": request.language or 'en',
             "created_at": datetime.now(timezone.utc)
         }

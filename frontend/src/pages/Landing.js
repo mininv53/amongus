@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../i18n';
 import { motion } from 'framer-motion';
-import { Shield, Image, Music, Link2, Search, Share2, Globe, ArrowRight, Check, AlertTriangle } from 'lucide-react';
+import { Shield, Image, Music, Link2, Search, Share2, Globe, ArrowRight, Check, AlertTriangle, Layers } from 'lucide-react';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -14,12 +14,12 @@ export default function Landing() {
   const { t } = useLanguage();
 
   const features = [
+    { icon: Layers, title: t('feat_multimodel_title'), desc: t('feat_multimodel_desc'), color: 'text-primary' },
     { icon: Image, title: t('feat_image_title'), desc: t('feat_image_desc'), color: 'text-teal-400' },
     { icon: Music, title: t('feat_audio_title'), desc: t('feat_audio_desc'), color: 'text-lime-400' },
     { icon: Link2, title: t('feat_url_title'), desc: t('feat_url_desc'), color: 'text-sky-400' },
     { icon: Search, title: t('feat_signals_title'), desc: t('feat_signals_desc'), color: 'text-amber-400' },
     { icon: Share2, title: t('feat_share_title'), desc: t('feat_share_desc'), color: 'text-teal-400' },
-    { icon: Globe, title: t('feat_multi_title'), desc: t('feat_multi_desc'), color: 'text-lime-400' },
   ];
 
   const steps = [
@@ -37,7 +37,7 @@ export default function Landing() {
             <motion.div {...fadeInUp}>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-primary text-xs font-medium mb-6">
                 <Shield className="w-3.5 h-3.5" />
-                AI-Powered Deepfake Detection
+                Multi-Model AI Deepfake Detection
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight">
                 {t('hero_title')}<br />
@@ -88,20 +88,28 @@ export default function Landing() {
                       <span className="text-muted-foreground">{'{'}</span>
                     </div>
                     <div className="flex gap-2 pl-4">
-                      <span className="text-primary">"trust_score"</span>:
-                      <span className="text-lime-400">87</span>,
+                      <span className="text-primary">"consensus_score"</span>:
+                      <span className="text-lime-400">81</span>,
                     </div>
                     <div className="flex gap-2 pl-4">
-                      <span className="text-primary">"verdict"</span>:
-                      <span className="text-green-400">"LIKELY_AUTHENTIC"</span>,
+                      <span className="text-primary">"models"</span>:
+                      <span className="text-muted-foreground">[</span>
+                    </div>
+                    <div className="flex gap-2 pl-8">
+                      <span className="text-emerald-400">"GPT-5.1"</span>: <span className="text-lime-400">82</span>,
+                    </div>
+                    <div className="flex gap-2 pl-8">
+                      <span className="text-orange-400">"Claude 4.5"</span>: <span className="text-lime-400">72</span>,
+                    </div>
+                    <div className="flex gap-2 pl-8">
+                      <span className="text-blue-400">"Gemini 2.5"</span>: <span className="text-lime-400">88</span>
                     </div>
                     <div className="flex gap-2 pl-4">
-                      <span className="text-primary">"confidence"</span>:
-                      <span className="text-lime-400">0.92</span>,
+                      <span className="text-muted-foreground">]</span>,
                     </div>
                     <div className="flex gap-2 pl-4">
-                      <span className="text-primary">"signals"</span>:
-                      <span className="text-muted-foreground">[5 detected]</span>
+                      <span className="text-primary">"consensus"</span>:
+                      <span className="text-green-400">"unanimous"</span>
                     </div>
                     <div className="flex gap-2">
                       <span className="text-muted-foreground">{'}'}</span>

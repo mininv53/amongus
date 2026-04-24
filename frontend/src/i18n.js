@@ -29,6 +29,8 @@ const translations = {
     feat_share_desc: "Generate unique result links to share analysis reports with teams or publicly.",
     feat_multi_title: "Multilingual",
     feat_multi_desc: "Full support for English and Russian with localized AI explanations.",
+    feat_multimodel_title: "3 AI Models",
+    feat_multimodel_desc: "GPT-5.1, Claude Sonnet 4.5, and Gemini 2.5 Pro analyze in parallel for consensus-driven accuracy.",
     // How it works
     how_title: "How It Works",
     how_step1_title: "Upload or Paste",
@@ -185,6 +187,8 @@ const translations = {
     feat_share_desc: "Генерируйте уникальные ссылки на результаты для команд.",
     feat_multi_title: "Мультиязычность",
     feat_multi_desc: "Полная поддержка английского и русского с локализованными AI-объяснениями.",
+    feat_multimodel_title: "3 AI-модели",
+    feat_multimodel_desc: "GPT-5.1, Claude Sonnet 4.5 и Gemini 2.5 Pro анализируют параллельно для консенсусной точности.",
     how_title: "Как это работает",
     how_step1_title: "Загрузите или вставьте",
     how_step1_desc: "Перетащите изображение, загрузите аудио или вставьте URL.",

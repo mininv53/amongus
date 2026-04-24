@@ -1,34 +1,18 @@
 [
   {
-    "content": "Phase 1: POC - Test OpenAI Vision for image deepfake analysis",
-    "status": "completed"
+    "content": "Phase 3: Implement multi-model analysis engine (GPT-5.1 + Claude Sonnet 4.5 + Gemini 2.5 Pro)",
+    "status": "in_progress"
   },
   {
-    "content": "Phase 1: POC - Test audio analysis pipeline",
-    "status": "completed"
+    "content": "Phase 3: Update frontend to show multi-model consensus UI",
+    "status": "pending"
   },
   {
-    "content": "Phase 1: POC - Test URL content extraction + analysis",
-    "status": "completed"
+    "content": "Phase 3: Remove 'Made with Emergent' badge",
+    "status": "pending"
   },
   {
-    "content": "Phase 2: Get design guidelines from design agent",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 2: Backend implementation (FastAPI + OpenAI + MongoDB)",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 2: Frontend implementation (React + shadcn/ui)",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 2: All user stories covered in Development",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 2: End to End Testing using Testing Agent",
-    "status": "completed"
+    "content": "Phase 3: End to End Testing",
+    "status": "pending"
   }
 ]
