@@ -1,0 +1,34 @@
+[
+  {
+    "content": "Phase 1: POC - Test OpenAI Vision for image deepfake analysis",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 1: POC - Test audio analysis pipeline",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 1: POC - Test URL content extraction + analysis",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 2: Get design guidelines from design agent",
+    "status": "in_progress"
+  },
+  {
+    "content": "Phase 2: Backend implementation (FastAPI + OpenAI + MongoDB)",
+    "status": "pending"
+  },
+  {
+    "content": "Phase 2: Frontend implementation (React + shadcn/ui)",
+    "status": "pending"
+  },
+  {
+    "content": "Phase 2: All user stories covered in Development",
+    "status": "pending"
+  },
+  {
+    "content": "Phase 2: End to End Testing using Testing Agent",
+    "status": "pending"
+  }
+]
