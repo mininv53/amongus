@@ -1,12 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '../i18n';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Shield } from 'lucide-react';
 
 export const Navbar = () => {
-  const { t, lang, cycleLang, nextLangLabel } = useLanguage();
+  const { t, lang, setLang, LANG_ORDER, LANG_LABELS } = useLanguage();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const isActive = (path) => location.pathname === path;
 
@@ -18,30 +26,36 @@ export const Navbar = () => {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl" data-testid="navbar">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
+    <nav
+      className={`sticky top-0 z-50 transition-colors ${
+        scrolled
+          ? 'border-b border-border/60 bg-background/75 backdrop-blur-xl'
+          : 'border-b border-transparent bg-transparent'
+      }`}
+      data-testid="navbar"
+    >
+      <div className="container-page">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group" data-testid="nav-logo">
-            <img
-              src="/logo.jpg"
-              alt="DeepGuard"
-              className="w-9 h-9 rounded-lg object-cover"
-            />
-            <span className="text-lg font-semibold tracking-tight font-['Space_Grotesk']">DeepGuard</span>
+            <span className="relative w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-primary/30 to-primary/10 border border-primary/40">
+              <Shield className="w-4 h-4 text-primary" />
+              <span className="absolute inset-0 rounded-xl shadow-[0_0_22px_2px_hsl(var(--primary)/0.35)] pointer-events-none" />
+            </span>
+            <span className="text-base font-semibold tracking-tight">DeepGuard</span>
           </Link>
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-1">
-            {navLinks.map(link => (
+            {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 data-testid={`nav-link-${link.path.replace('/', '') || 'home'}`}
-                className={`px-3 py-2 text-sm rounded-md transition-colors ${
+                className={`px-3 py-2 text-sm rounded-full transition-colors ${
                   isActive(link.path)
-                    ? 'text-primary bg-primary/10'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    ? 'text-foreground bg-card/70 border border-border'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {link.label}
@@ -50,30 +64,41 @@ export const Navbar = () => {
           </div>
 
           {/* Right side */}
-          <div className="flex items-center gap-3">
-            {/* Language toggle */}
-            <button
-              onClick={cycleLang}
-              data-testid="language-toggle"
-              className="px-2.5 py-1.5 text-xs font-medium rounded-md border border-border hover:border-primary/50 transition-colors text-muted-foreground hover:text-foreground"
-            >
-              {nextLangLabel()}
-            </button>
+          <div className="flex items-center gap-2">
+            {/* Segmented language toggle */}
+            <div className="segmented" role="tablist" aria-label="Language">
+              {LANG_ORDER.map((code) => (
+                <button
+                  key={code}
+                  type="button"
+                  role="tab"
+                  aria-selected={lang === code}
+                  data-active={lang === code}
+                  onClick={() => setLang(code)}
+                  data-testid={`lang-${code}`}
+                  className="segmented-item"
+                >
+                  {LANG_LABELS[code]}
+                </button>
+              ))}
+            </div>
 
             {/* CTA */}
             <Link
               to="/analyze"
               data-testid="nav-run-scan-button"
-              className="hidden sm:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 btn-press transition-colors"
+              className="hidden sm:inline-flex pill pill-primary"
             >
               {t('nav_run_scan')}
             </Link>
 
             {/* Mobile menu */}
             <button
+              type="button"
               className="md:hidden p-2 text-muted-foreground hover:text-foreground"
               onClick={() => setMobileOpen(!mobileOpen)}
               data-testid="mobile-menu-toggle"
+              aria-label="Menu"
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -84,15 +109,15 @@ export const Navbar = () => {
       {/* Mobile menu */}
       {mobileOpen && (
         <div className="md:hidden border-t border-border bg-background/95 backdrop-blur-xl">
-          <div className="px-4 py-3 space-y-1">
-            {navLinks.map(link => (
+          <div className="container-page py-3 space-y-1">
+            {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 onClick={() => setMobileOpen(false)}
                 className={`block px-3 py-2 text-sm rounded-md ${
                   isActive(link.path)
-                    ? 'text-primary bg-primary/10'
+                    ? 'text-foreground bg-card/70'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -102,7 +127,7 @@ export const Navbar = () => {
             <Link
               to="/analyze"
               onClick={() => setMobileOpen(false)}
-              className="block w-full text-center px-4 py-2 mt-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg"
+              className="mt-2 inline-flex pill pill-primary w-full justify-center"
             >
               {t('nav_run_scan')}
             </Link>
