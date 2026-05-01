@@ -1,25 +1,144 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useLanguage } from '../i18n';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Shield, Image, Music, Link2, Search, Share2, ArrowRight, AlertTriangle, Layers } from 'lucide-react';
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Image as ImageIcon,
+  Music,
+  Link2,
+  Layers,
+  Search,
+  Share2,
+  Check,
+} from 'lucide-react';
+import { useLanguage } from '../i18n';
+import ParticleField from '../components/ParticleField';
+import StickyCTA from '../components/StickyCTA';
+import useCountUp from '../hooks/useCountUp';
+import { useStepReveal, useScrollProgress } from '../hooks/useScrollReveal';
 
-const fadeInUp = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5 }
-};
+function StatBlock({ value, decimals = 0, suffix = '', label }) {
+  const ref = useCountUp(value, { decimals });
+  return (
+    <div className="text-center sm:text-left">
+      <div className="flex items-baseline justify-center sm:justify-start gap-1">
+        <span ref={ref} className="text-3xl sm:text-4xl font-semibold tracking-tight tighter">
+          0
+        </span>
+        {suffix && (
+          <span className="text-3xl sm:text-4xl font-semibold tracking-tight text-muted-foreground tighter">
+            {suffix}
+          </span>
+        )}
+      </div>
+      <p className="mt-1 text-xs text-muted-foreground max-w-[16ch] mx-auto sm:mx-0 leading-snug">
+        {label}
+      </p>
+    </div>
+  );
+}
+
+function HeroDemo() {
+  const ref = useScrollProgress();
+  return (
+    <div
+      ref={ref}
+      className="relative bento-card p-5 sm:p-6 halo-teal"
+      style={{ '--progress': 0 }}
+    >
+      <div className="absolute inset-0 rounded-[inherit] overflow-hidden pointer-events-none">
+        <div className="scanner-sheen absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-primary/12 to-transparent" />
+      </div>
+
+      <div className="relative">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
+          <div className="w-2.5 h-2.5 rounded-full bg-amber-500/60" />
+          <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
+          <span className="ml-2 text-[11px] uppercase tracking-[0.18em] text-muted-foreground font-mono">
+            scan_result.json
+          </span>
+        </div>
+
+        <div className="space-y-3 font-mono text-[12.5px] leading-relaxed">
+          <div className="text-muted-foreground">{'{'}</div>
+          <div className="pl-4">
+            <span className="text-primary">"trust_score"</span>:{' '}
+            <span className="text-accent">81</span>,
+          </div>
+          <div className="pl-4">
+            <span className="text-primary">"verdict"</span>:{' '}
+            <span className="text-accent">"likely_authentic"</span>,
+          </div>
+          <div className="pl-4">
+            <span className="text-primary">"models"</span>: [
+          </div>
+          <div className="pl-8">
+            <span className="text-emerald-300">"GPT"</span>:{' '}
+            <span className="text-accent">82</span>,
+          </div>
+          <div className="pl-8">
+            <span className="text-orange-300">"Claude"</span>:{' '}
+            <span className="text-accent">72</span>,
+          </div>
+          <div className="pl-8">
+            <span className="text-sky-300">"Gemini"</span>:{' '}
+            <span className="text-accent">88</span>
+          </div>
+          <div className="pl-4 text-muted-foreground">]</div>
+          <div className="pl-4">
+            <span className="text-primary">"consensus"</span>:{' '}
+            <span className="text-emerald-300">"unanimous"</span>
+          </div>
+          <div className="text-muted-foreground">{'}'}</div>
+        </div>
+
+        {/* Scroll-driven trust gauge */}
+        <div className="mt-6 pt-5 border-t border-border/60">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground font-mono">
+              Trust Score
+            </span>
+            <span className="text-2xl font-semibold text-gradient-teal tabular-nums tighter">
+              81
+            </span>
+          </div>
+          <div className="relative h-2 rounded-full bg-card overflow-hidden border border-border/60">
+            <div
+              className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary via-primary to-accent"
+              style={{ width: 'calc(var(--progress, 0) * 81%)' }}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Landing() {
   const { t } = useLanguage();
+  const navigate = useNavigate();
+  const [inlineUrl, setInlineUrl] = useState('');
+  const stepsRef = useStepReveal();
+
+  const submitInline = (e) => {
+    e?.preventDefault();
+    const v = inlineUrl.trim();
+    if (!v) {
+      navigate('/analyze');
+      return;
+    }
+    navigate(`/analyze?url=${encodeURIComponent(v)}`);
+  };
 
   const features = [
-    { icon: Layers, title: t('feat_multimodel_title'), desc: t('feat_multimodel_desc'), color: 'text-primary' },
-    { icon: Image, title: t('feat_image_title'), desc: t('feat_image_desc'), color: 'text-teal-400' },
-    { icon: Music, title: t('feat_audio_title'), desc: t('feat_audio_desc'), color: 'text-lime-400' },
-    { icon: Link2, title: t('feat_url_title'), desc: t('feat_url_desc'), color: 'text-sky-400' },
-    { icon: Search, title: t('feat_signals_title'), desc: t('feat_signals_desc'), color: 'text-amber-400' },
-    { icon: Share2, title: t('feat_share_title'), desc: t('feat_share_desc'), color: 'text-teal-400' },
+    { icon: Layers, title: t('feat_multimodel_title'), desc: t('feat_multimodel_desc') },
+    { icon: ImageIcon, title: t('feat_image_title'), desc: t('feat_image_desc') },
+    { icon: Music, title: t('feat_audio_title'), desc: t('feat_audio_desc') },
+    { icon: Link2, title: t('feat_url_title'), desc: t('feat_url_desc') },
+    { icon: Search, title: t('feat_signals_title'), desc: t('feat_signals_desc') },
+    { icon: Share2, title: t('feat_share_title'), desc: t('feat_share_desc') },
   ];
 
   const steps = [
@@ -29,120 +148,146 @@ export default function Landing() {
   ];
 
   return (
-    <div className="min-h-screen">
-      {/* Hero */}
-      <section className="relative hero-gradient" data-testid="landing-hero">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 py-20 sm:py-28 lg:py-36">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <motion.div {...fadeInUp}>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-primary text-xs font-medium mb-6">
-                <Shield className="w-3.5 h-3.5" />
-                Multi-Model AI Deepfake Detection
-              </div>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-tight">
-                {t('hero_title')}<br />
-                <span className="text-primary">{t('hero_title2')}</span>
-              </h1>
-              <p className="mt-6 text-base sm:text-lg text-muted-foreground max-w-lg leading-relaxed">
-                {t('hero_subtitle')}
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link
-                  to="/analyze"
-                  data-testid="hero-cta-primary"
-                  className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 btn-press transition-colors"
-                >
-                  {t('hero_cta')}
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-                <Link
-                  to="/enterprise"
-                  data-testid="hero-cta-secondary"
-                  className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium border border-border rounded-lg hover:border-primary/50 hover:bg-card/50 transition-colors"
-                >
-                  {t('hero_cta2')}
-                </Link>
-              </div>
-            </motion.div>
+    <div className="relative">
+      {/* === Hero === */}
+      <section className="relative overflow-hidden" data-testid="landing-hero">
+        <div className="aurora-bg" />
+        <ParticleField className="opacity-70" density={1400} />
 
-            {/* Demo Card */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="hidden lg:block"
-            >
-              <div className="relative p-6 rounded-2xl border border-border bg-card/80 backdrop-blur glow-teal">
-                <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
-                  <div className="scanner-sheen absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-primary/8 to-transparent" />
-                </div>
-                <div className="relative">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-3 h-3 rounded-full bg-red-500/60" />
-                    <div className="w-3 h-3 rounded-full bg-amber-500/60" />
-                    <div className="w-3 h-3 rounded-full bg-green-500/60" />
-                    <span className="ml-2 text-xs text-muted-foreground font-mono">analysis_result.json</span>
-                  </div>
-                  <div className="space-y-3 font-mono text-xs">
-                    <div className="flex gap-2">
-                      <span className="text-muted-foreground">{'{'}</span>
-                    </div>
-                    <div className="flex gap-2 pl-4">
-                      <span className="text-primary">"consensus_score"</span>:
-                      <span className="text-lime-400">81</span>,
-                    </div>
-                    <div className="flex gap-2 pl-4">
-                      <span className="text-primary">"models"</span>:
-                      <span className="text-muted-foreground">[</span>
-                    </div>
-                    <div className="flex gap-2 pl-8">
-                      <span className="text-emerald-400">"GPT-5.1"</span>: <span className="text-lime-400">82</span>,
-                    </div>
-                    <div className="flex gap-2 pl-8">
-                      <span className="text-orange-400">"Claude 4.5"</span>: <span className="text-lime-400">72</span>,
-                    </div>
-                    <div className="flex gap-2 pl-8">
-                      <span className="text-blue-400">"Gemini 2.5"</span>: <span className="text-lime-400">88</span>
-                    </div>
-                    <div className="flex gap-2 pl-4">
-                      <span className="text-muted-foreground">]</span>,
-                    </div>
-                    <div className="flex gap-2 pl-4">
-                      <span className="text-primary">"consensus"</span>:
-                      <span className="text-green-400">"unanimous"</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <span className="text-muted-foreground">{'}'}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
+        <div className="container-page relative pt-16 sm:pt-24 lg:pt-28 pb-16 sm:pb-24">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex justify-center"
+          >
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-card/60 backdrop-blur text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_10px_2px_hsl(var(--primary))]" />
+              {t('hero_eyebrow')}
+            </span>
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.05 }}
+            className="mt-7 text-center font-serif text-5xl sm:text-6xl lg:text-7xl xl:text-[5.5rem] leading-[1.02] tighter"
+          >
+            <span className="block text-foreground">{t('hero_title_a')}</span>
+            <span className="my-3 inline-flex items-center justify-center">
+              <span className="glow-pill font-serif italic text-primary text-4xl sm:text-5xl lg:text-6xl xl:text-7xl">
+                {t('hero_title_pill')}
+              </span>
+            </span>
+            <span className="block text-foreground">{t('hero_title_b')}</span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+            className="mt-6 max-w-xl mx-auto text-center text-base sm:text-lg text-muted-foreground leading-relaxed"
+          >
+            {t('hero_subtitle')}
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.22 }}
+            className="mt-9 flex flex-col items-center gap-3"
+          >
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <Link to="/analyze" data-testid="hero-cta-primary" className="pill pill-primary">
+                {t('hero_cta_primary')}
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <a href="#how" data-testid="hero-cta-secondary" className="pill pill-ghost">
+                {t('hero_cta_secondary')}
+              </a>
+            </div>
+            <p className="text-xs text-muted-foreground">{t('hero_microcopy')}</p>
+          </motion.div>
+
+          {/* Inline mini-demo */}
+          <motion.form
+            onSubmit={submitInline}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.32 }}
+            className="mt-10 max-w-xl mx-auto"
+            data-testid="hero-inline-demo"
+          >
+            <p className="text-center text-xs text-muted-foreground mb-2">
+              {t('hero_inline_label')}
+            </p>
+            <div className="flex items-center gap-2 p-1.5 pl-4 rounded-full border border-border bg-card/60 backdrop-blur halo-teal">
+              <input
+                value={inlineUrl}
+                onChange={(e) => setInlineUrl(e.target.value)}
+                type="url"
+                inputMode="url"
+                placeholder={t('hero_inline_placeholder')}
+                className="flex-1 bg-transparent text-sm placeholder:text-muted-foreground/70 outline-none"
+                data-testid="hero-inline-input"
+              />
+              <button type="submit" className="pill pill-primary !py-2 !px-4" data-testid="hero-inline-submit">
+                {t('hero_inline_button')}
+                <ArrowUpRight className="w-4 h-4" />
+              </button>
+            </div>
+          </motion.form>
+
+          {/* Hero demo card */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mt-14 sm:mt-16 max-w-3xl mx-auto"
+          >
+            <HeroDemo />
+          </motion.div>
         </div>
-
-        {/* Social proof - removed for clean prototype look */}
       </section>
 
-      {/* Features */}
-      <section className="py-16 sm:py-24" data-testid="landing-features">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">{t('features_title')}</h2>
-            <p className="mt-3 text-muted-foreground">{t('features_subtitle')}</p>
+      {/* === Trust strip === */}
+      <section className="relative" data-testid="landing-trust-strip">
+        <div className="container-page">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-y-8 sm:gap-y-10 gap-x-6 py-10 sm:py-14 border-y border-border/60">
+            <StatBlock value={3} label={t('stat_models')} />
+            <StatBlock value={30} suffix="s" label={t('stat_speed')} />
+            <StatBlock value={0} label={t('stat_signup')} />
+            <StatBlock value={100} suffix="%" label={t('stat_proof')} />
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        </div>
+      </section>
+
+      {/* === Features === */}
+      <section className="relative py-20 sm:py-28" data-testid="landing-features">
+        <div className="container-page">
+          <div className="text-center mb-12">
+            <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              {t('features_eyebrow')}
+            </span>
+            <h2 className="mt-3 font-serif text-4xl sm:text-5xl tighter">
+              {t('features_title')}
+            </h2>
+            <p className="mt-4 max-w-xl mx-auto text-muted-foreground">
+              {t('features_subtitle')}
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {features.map((feat, i) => (
               <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 16 }}
+                key={feat.title}
+                initial={{ opacity: 0, y: 18 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.08 }}
-                className="bento-card p-5 rounded-xl border border-border bg-card/50 group"
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.45, delay: i * 0.05 }}
+                className="bento-card p-6"
               >
-                <div className={`w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center mb-3 ${feat.color}`}>
-                  <feat.icon className="w-5 h-5" />
+                <div className="w-10 h-10 rounded-xl border border-primary/30 bg-primary/10 text-primary flex items-center justify-center mb-4">
+                  <feat.icon className="w-4 h-4" />
                 </div>
                 <h3 className="text-base font-semibold mb-1.5">{feat.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{feat.desc}</p>
@@ -152,126 +297,179 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* How it works */}
-      <section className="py-16 sm:py-24 bg-card/30" data-testid="landing-how-it-works">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">{t('how_title')}</h2>
+      {/* === How it works === */}
+      <section
+        id="how"
+        className="relative py-20 sm:py-28 border-t border-border/60 bg-card/20"
+        data-testid="landing-how-it-works"
+      >
+        <div className="container-page">
+          <div className="text-center mb-14">
+            <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              {t('how_eyebrow')}
+            </span>
+            <h2 className="mt-3 font-serif text-4xl sm:text-5xl tighter">{t('how_title')}</h2>
           </div>
-          <div className="grid sm:grid-cols-3 gap-8 mb-12">
-            {steps.map((step, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.15 }}
-                className="text-center"
+
+          <div ref={stepsRef} className="relative grid sm:grid-cols-3 gap-8 sm:gap-6 max-w-5xl mx-auto">
+            {/* Connecting timeline */}
+            <div className="hidden sm:block absolute left-0 right-0 top-7 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+
+            {steps.map((step) => (
+              <div
+                key={step.num}
+                data-step={step.num}
+                className="relative text-center transition-opacity"
+                style={{ transition: 'opacity 0.5s ease, transform 0.5s ease' }}
               >
-                <div className="w-12 h-12 rounded-full border border-primary/30 bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <span className="text-sm font-semibold text-primary font-mono">{step.num}</span>
+                <div className="relative w-14 h-14 mx-auto mb-5 rounded-full bg-card border border-border flex items-center justify-center">
+                  <span className="text-xs font-mono text-primary">{step.num}</span>
+                  <span className="absolute inset-0 rounded-full shadow-[0_0_22px_2px_hsl(var(--primary)/0.35)] pointer-events-none opacity-0 [.is-active_&]:opacity-100 transition-opacity" />
                 </div>
-                <h3 className="text-base font-semibold mb-2">{step.title}</h3>
-                <p className="text-sm text-muted-foreground">{step.desc}</p>
-              </motion.div>
+                <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
+                <p className="text-sm text-muted-foreground max-w-xs mx-auto leading-relaxed">
+                  {step.desc}
+                </p>
+              </div>
             ))}
           </div>
+
           {/* Disclaimer */}
-          <div className="max-w-xl mx-auto p-4 rounded-xl border border-amber-500/20 bg-amber-500/5">
-            <div>
-              <h4 className="text-sm font-semibold text-amber-400 mb-1">{t('how_disclaimer')}</h4>
-              <p className="text-xs text-muted-foreground leading-relaxed">{t('how_disclaimer_text')}</p>
-            </div>
+          <div className="max-w-2xl mx-auto mt-16 p-5 rounded-2xl border border-amber-500/20 bg-amber-500/5">
+            <p className="text-sm font-semibold text-amber-300 mb-1">{t('how_disclaimer')}</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {t('how_disclaimer_text')}
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Pricing */}
-      <section className="py-16 sm:py-24" data-testid="landing-pricing">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">{t('pricing_title')}</h2>
-            <p className="mt-3 text-muted-foreground">{t('pricing_subtitle')}</p>
+      {/* === Pricing === */}
+      <section className="relative py-20 sm:py-28" data-testid="landing-pricing">
+        <div className="container-page">
+          <div className="text-center mb-14">
+            <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              {t('pricing_eyebrow')}
+            </span>
+            <h2 className="mt-3 font-serif text-4xl sm:text-5xl tighter">{t('pricing_title')}</h2>
+            <p className="mt-4 max-w-xl mx-auto text-muted-foreground">{t('pricing_subtitle')}</p>
           </div>
-          <div className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+
+          <div className="grid sm:grid-cols-3 gap-5 max-w-5xl mx-auto">
             {/* Free */}
-            <div className="p-6 rounded-xl border border-border bg-card/50" data-testid="landing-pricing-tier-free">
-              <h3 className="text-lg font-semibold">{t('pricing_free')}</h3>
-              <p className="text-sm text-muted-foreground mt-1">{t('pricing_free_desc')}</p>
-              <div className="mt-4 mb-6">
-                <span className="text-3xl font-bold font-['Space_Grotesk']">$0</span>
-              </div>
-              <ul className="space-y-2.5 mb-6">
-                {[t('pricing_free_f1'), t('pricing_free_f2'), t('pricing_free_f3'), t('pricing_free_f4')].map((f, i) => (
-                  <li key={i} className="text-sm text-muted-foreground">
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link to="/analyze" className="block w-full text-center px-4 py-2.5 text-sm font-medium border border-border rounded-lg hover:border-primary/50 transition-colors">
-                {t('pricing_cta_free')}
-              </Link>
-            </div>
+            <PricingCard
+              name={t('pricing_free')}
+              desc={t('pricing_free_desc')}
+              price={t('pricing_free_price')}
+              priceUnit={t('pricing_free_price_unit')}
+              features={[
+                t('pricing_free_f1'),
+                t('pricing_free_f2'),
+                t('pricing_free_f3'),
+                t('pricing_free_f4'),
+              ]}
+              cta={t('pricing_cta_free')}
+              to="/analyze"
+              testId="landing-pricing-tier-free"
+            />
 
             {/* Pro */}
-            <div className="p-6 rounded-xl pricing-highlight bg-card relative" data-testid="landing-pricing-tier-pro">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-primary text-primary-foreground text-xs font-medium rounded-full">
-                {t('pricing_popular')}
-              </div>
-              <h3 className="text-lg font-semibold">{t('pricing_pro')}</h3>
-              <p className="text-sm text-muted-foreground mt-1">{t('pricing_pro_desc')}</p>
-              <div className="mt-4 mb-6">
-                <span className="text-3xl font-bold font-['Space_Grotesk']">{t('pricing_pro_price')}</span>
-              </div>
-              <ul className="space-y-2.5 mb-6">
-                {[t('pricing_pro_f1'), t('pricing_pro_f2'), t('pricing_pro_f3'), t('pricing_pro_f4'), t('pricing_pro_f5')].map((f, i) => (
-                  <li key={i} className="text-sm text-muted-foreground">
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link to="/analyze" className="block w-full text-center px-4 py-2.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 btn-press transition-colors">
-                {t('pricing_cta_pro')}
-              </Link>
-            </div>
+            <PricingCard
+              highlight
+              badge={t('pricing_popular')}
+              name={t('pricing_pro')}
+              desc={t('pricing_pro_desc')}
+              price={t('pricing_pro_price')}
+              priceUnit={t('pricing_pro_price_unit')}
+              features={[
+                t('pricing_pro_f1'),
+                t('pricing_pro_f2'),
+                t('pricing_pro_f3'),
+                t('pricing_pro_f4'),
+                t('pricing_pro_f5'),
+              ]}
+              cta={t('pricing_cta_pro')}
+              to="/enterprise"
+              testId="landing-pricing-tier-pro"
+            />
 
             {/* Enterprise */}
-            <div className="p-6 rounded-xl border border-border bg-card/50" data-testid="landing-pricing-tier-enterprise">
-              <h3 className="text-lg font-semibold">{t('pricing_enterprise')}</h3>
-              <p className="text-sm text-muted-foreground mt-1">{t('pricing_enterprise_desc')}</p>
-              <div className="mt-4 mb-6">
-                <span className="text-3xl font-bold font-['Space_Grotesk']">{t('pricing_enterprise_price')}</span>
-              </div>
-              <ul className="space-y-2.5 mb-6">
-                {[t('pricing_enterprise_f1'), t('pricing_enterprise_f2'), t('pricing_enterprise_f3'), t('pricing_enterprise_f4'), t('pricing_enterprise_f5')].map((f, i) => (
-                  <li key={i} className="text-sm text-muted-foreground">
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link to="/enterprise" className="block w-full text-center px-4 py-2.5 text-sm font-medium border border-border rounded-lg hover:border-primary/50 transition-colors">
-                {t('pricing_cta_enterprise')}
+            <PricingCard
+              name={t('pricing_enterprise')}
+              desc={t('pricing_enterprise_desc')}
+              price={t('pricing_enterprise_price')}
+              priceUnit={t('pricing_enterprise_price_unit')}
+              features={[
+                t('pricing_enterprise_f1'),
+                t('pricing_enterprise_f2'),
+                t('pricing_enterprise_f3'),
+                t('pricing_enterprise_f4'),
+                t('pricing_enterprise_f5'),
+              ]}
+              cta={t('pricing_cta_enterprise')}
+              to="/enterprise"
+              testId="landing-pricing-tier-enterprise"
+              ghost
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* === Final CTA === */}
+      <section className="relative py-20 sm:py-28" data-testid="landing-cta">
+        <div className="container-page">
+          <div className="relative bento-card p-10 sm:p-14 text-center halo-teal overflow-hidden">
+            <div className="aurora-bg" />
+            <div className="relative">
+              <h2 className="font-serif text-3xl sm:text-5xl tighter mb-4">{t('cta_title')}</h2>
+              <p className="max-w-xl mx-auto text-muted-foreground mb-7">{t('cta_subtitle')}</p>
+              <Link to="/analyze" className="pill pill-primary" data-testid="landing-cta-button">
+                {t('cta_button')}
+                <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="py-16 sm:py-24 bg-card/50" data-testid="landing-cta">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-10 text-center">
-          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">{t('cta_title')}</h2>
-          <p className="mt-4 text-muted-foreground">{t('cta_subtitle')}</p>
-          <Link
-            to="/analyze"
-            data-testid="cta-button"
-            className="inline-flex items-center gap-2 mt-8 px-8 py-3.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 btn-press transition-colors"
-          >
-            {t('cta_button')}
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-      </section>
+      <StickyCTA />
+    </div>
+  );
+}
+
+function PricingCard({ name, desc, price, priceUnit, features, cta, to, highlight, ghost, badge, testId }) {
+  return (
+    <div
+      data-testid={testId}
+      className={`bento-card p-7 flex flex-col ${highlight ? 'pricing-highlight' : ''}`}
+    >
+      {highlight && badge && (
+        <span className="absolute top-4 right-4 text-[10px] uppercase tracking-[0.2em] px-2 py-1 rounded-full border border-primary/40 text-primary bg-primary/10">
+          {badge}
+        </span>
+      )}
+      <div className="mb-5">
+        <h3 className="text-lg font-semibold">{name}</h3>
+        <p className="text-sm text-muted-foreground mt-1">{desc}</p>
+      </div>
+      <div className="flex items-baseline gap-2 mb-6">
+        <span className="text-4xl font-semibold tighter">{price}</span>
+        <span className="text-sm text-muted-foreground">{priceUnit}</span>
+      </div>
+      <ul className="space-y-2.5 mb-7 flex-1">
+        {features.map((f) => (
+          <li key={f} className="flex items-start gap-2 text-sm">
+            <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+            <span>{f}</span>
+          </li>
+        ))}
+      </ul>
+      <Link
+        to={to}
+        className={`pill w-full justify-center ${ghost ? 'pill-ghost' : 'pill-primary'}`}
+      >
+        {cta}
+      </Link>
     </div>
   );
 }
