@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,31 +6,32 @@
 
 @layer base {
   :root {
-    --background: 160 30% 4%;
-    --foreground: 0 0% 98%;
-    --card: 165 22% 8%;
-    --card-foreground: 0 0% 98%;
-    --popover: 165 22% 8%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 168 78% 45%;
-    --primary-foreground: 160 30% 4%;
-    --secondary: 165 18% 14%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 165 18% 14%;
-    --muted-foreground: 160 10% 72%;
-    --accent: 84 85% 55%;
-    --accent-foreground: 160 30% 4%;
+    /* Atmospheric pure-black palette */
+    --background: 0 0% 2%;
+    --foreground: 0 0% 96%;
+    --card: 165 15% 6%;
+    --card-foreground: 0 0% 96%;
+    --popover: 165 15% 6%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 168 78% 55%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 165 10% 12%;
+    --secondary-foreground: 0 0% 96%;
+    --muted: 165 8% 10%;
+    --muted-foreground: 160 6% 70%;
+    --accent: 84 80% 60%;
+    --accent-foreground: 0 0% 4%;
     --destructive: 0 78% 55%;
     --destructive-foreground: 0 0% 98%;
-    --border: 165 18% 18%;
-    --input: 165 18% 18%;
-    --ring: 168 78% 45%;
+    --border: 165 12% 14%;
+    --input: 165 12% 14%;
+    --ring: 168 78% 55%;
     --radius: 0.75rem;
-    --chart-1: 168 78% 45%;
-    --chart-2: 84 85% 55%;
-    --chart-3: 195 85% 55%;
-    --chart-4: 38 92% 55%;
-    --chart-5: 0 78% 55%;
+    --chart-1: 168 78% 55%;
+    --chart-2: 84 80% 60%;
+    --chart-3: 195 85% 60%;
+    --chart-4: 38 92% 60%;
+    --chart-5: 0 78% 60%;
   }
 }
 
@@ -48,6 +49,10 @@
   code, pre, .font-mono {
     font-family: 'IBM Plex Mono', monospace;
   }
+  .font-serif {
+    font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+    font-feature-settings: "ss01" on;
+  }
 }
 
 /* Noise texture overlay */
@@ -60,7 +65,7 @@ body::before {
   height: 100%;
   pointer-events: none;
   z-index: 9999;
-  opacity: 0.04;
+  opacity: 0.03;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
@@ -69,12 +74,12 @@ body::before {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: hsl(160 30% 4%);
+  background: hsl(0 0% 2%);
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(165 18% 18%);
+  background: hsl(165 12% 14%);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(168 78% 45% / 0.5);
+  background: hsl(168 78% 55% / 0.5);
 }
