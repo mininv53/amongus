@@ -1,12 +1,10 @@
-/* DeepGuard App Styles */
-
-/* Hero gradient overlay */
 .hero-gradient {
-  background: radial-gradient(900px circle at 20% 10%, rgba(20, 184, 166, 0.18), transparent 55%),
-              radial-gradient(700px circle at 80% 20%, rgba(132, 204, 22, 0.10), transparent 60%);
+  background:
+    radial-gradient(900px circle at 16% 14%, rgba(196, 122, 74, 0.24), transparent 48%),
+    radial-gradient(720px circle at 78% 18%, rgba(232, 214, 177, 0.14), transparent 54%),
+    linear-gradient(135deg, #0d0f0d 0%, #19130f 48%, #090908 100%);
 }
 
-/* Scanner sheen animation */
 @keyframes scannerSheen {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
@@ -25,65 +23,106 @@
   animation: gaugeReveal 1.5s ease-out forwards;
 }
 
-/* Glow effects */
 .glow-teal {
-  box-shadow: 0 0 0 1px rgba(20,184,166,0.25), 0 18px 60px rgba(20,184,166,0.10);
+  box-shadow: 0 0 0 1px rgba(196,122,74,0.25), 0 18px 60px rgba(196,122,74,0.10);
 }
 
 .glow-teal-hover:hover {
-  box-shadow: 0 0 0 1px rgba(20,184,166,0.4), 0 18px 60px rgba(20,184,166,0.15);
+  box-shadow: 0 0 0 1px rgba(196,122,74,0.4), 0 18px 60px rgba(196,122,74,0.15);
 }
 
-/* Dropzone styles */
 .dropzone-active {
-  border-color: hsl(168 78% 45%);
-  background: hsl(168 78% 45% / 0.05);
+  border-color: hsl(24 49% 53%);
+  background: hsl(24 49% 53% / 0.08);
 }
 
-/* Signal impact colors */
 .signal-positive { color: hsl(150 70% 45%); }
 .signal-negative { color: hsl(0 78% 55%); }
 .signal-neutral { color: hsl(38 92% 55%); }
 
-/* Smooth page transitions */
 .page-enter {
   opacity: 0;
   transform: translateY(12px);
 }
 
-/* Active button press */
 .btn-press:active {
   transform: scale(0.98);
 }
 
-/* Tab underline slide */
 .tab-active-line {
   transition: left 0.3s ease, width 0.3s ease;
 }
 
-/* Bento card hover */
 .bento-card {
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 .bento-card:hover {
-  border-color: hsl(168 78% 45% / 0.3);
-  box-shadow: 0 0 0 1px rgba(20,184,166,0.15), 0 12px 40px rgba(0,0,0,0.2);
+  border-color: hsl(24 49% 53% / 0.35);
+  box-shadow: 0 0 0 1px rgba(196,122,74,0.12), 0 22px 70px rgba(0,0,0,0.22);
+  transform: translateY(-2px);
 }
 
-/* Pricing card highlight */
 .pricing-highlight {
-  border-color: hsl(168 78% 45%);
-  box-shadow: 0 0 0 1px rgba(20,184,166,0.3), 0 24px 80px rgba(20,184,166,0.12);
+  box-shadow: 0 0 0 1px rgba(232,214,177,0.22), 0 24px 90px rgba(196,122,74,0.18);
 }
 
-/* Skeleton loading */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 
 .shimmer {
-  background: linear-gradient(90deg, transparent, rgba(20,184,166,0.08), transparent);
+  background: linear-gradient(90deg, transparent, rgba(232,214,177,0.08), transparent);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
+}
+
+.evidence-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(circle at 55% 35%, black, transparent 76%);
+}
+
+.text-gradient-soft {
+  background: linear-gradient(92deg, #f4ead4 0%, #c47a4a 44%, #d7d0af 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.case-board {
+  box-shadow: 0 38px 120px rgba(0,0,0,0.46), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.case-board-texture {
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(255,255,255,0.08), transparent 16%),
+    linear-gradient(135deg, rgba(255,255,255,0.04), transparent 28%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 15px);
+  opacity: 0.7;
+}
+
+.evidence-photo {
+  box-shadow: 0 24px 70px rgba(0,0,0,0.38);
+}
+
+.evidence-note {
+  border-radius: 1rem;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(10, 10, 9, 0.58);
+  padding: 1.05rem;
+  box-shadow: 0 22px 70px rgba(0,0,0,0.34);
+  backdrop-filter: blur(12px);
+}
+
+.pin {
+  position: absolute;
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 9999px;
+  background: #e8d6b1;
+  box-shadow: 0 0 0 4px rgba(232,214,177,0.14), 0 0 24px rgba(232,214,177,0.36);
 }

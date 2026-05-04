@@ -52,8 +52,11 @@ module.exports = {
   				'3': 'hsl(var(--chart-3))',
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
-  			}
-  		},
+			},
+			copper: '#c47a4a',
+			sand: '#e8d6b1',
+			sage: '#a7b58a'
+			},
   		keyframes: {
   			'accordion-down': {
   				from: {
