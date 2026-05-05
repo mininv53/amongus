@@ -17,7 +17,6 @@ export default function Analyzer() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState(null);
   const [currentStep, setCurrentStep] = useState(0);
-  const isStaticPreview = !API_URL && window.location.hostname.endsWith('devinapps.com');
 
   const analysisSteps = [
     { label: lang === 'ru' ? 'Загрузка файла...' : 'Uploading content...' },
@@ -28,12 +27,6 @@ export default function Analyzer() {
   ];
 
   const handleAnalyze = useCallback(async () => {
-    if (isStaticPreview) {
-      setIsAnalyzing(false);
-      toast.error(t('backend_unavailable'));
-      return;
-    }
-
     setIsAnalyzing(true);
     setResult(null);
     setCurrentStep(0);
@@ -91,7 +84,7 @@ export default function Analyzer() {
     } finally {
       setIsAnalyzing(false);
     }
-  }, [activeTab, selectedFile, urlInput, lang, isStaticPreview, t]);
+  }, [activeTab, selectedFile, urlInput, lang]);
 
   const handleNewScan = () => {
     setResult(null);
@@ -201,11 +194,6 @@ export default function Analyzer() {
               </>
             )}
           </button>
-          {isStaticPreview && (
-            <p className="mt-3 text-xs text-amber-300/90">
-              {t('backend_preview_note')}
-            </p>
-          )}
 
           {/* Analysis steps */}
           {isAnalyzing && (

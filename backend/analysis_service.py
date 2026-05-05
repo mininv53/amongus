@@ -3,9 +3,6 @@ import json
 import re
 import base64
 import asyncio
-import aiohttp
-from bs4 import BeautifulSoup
-from litellm import acompletion
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -36,6 +33,8 @@ MODEL_CATALOG = [
 
 
 def configured_models():
+    if os.environ.get("DEMO_ANALYSIS_ONLY") == "true":
+        return []
     return [
         model
         for model in MODEL_CATALOG
@@ -153,6 +152,8 @@ recommendations: array of 1-3 action items"""
 async def run_single_model(provider, model_name, label, prompt, image_base64=None):
     """Run analysis on a single model"""
     try:
+        from litellm import acompletion
+
         content = prompt
         if image_base64:
             content = [
@@ -388,29 +389,32 @@ async def analyze_url(url: str, language: str = 'en') -> dict:
     title = "Unknown"
     text_content = ""
     image_count = 0
-    
+
+    if not models:
+        return demo_analysis('url', language, title, image_count)
+
     try:
+        import aiohttp
+        from bs4 import BeautifulSoup
+
         async with aiohttp.ClientSession() as session:
             headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
             async with session.get(url, headers=headers, timeout=aiohttp.ClientTimeout(total=15)) as response:
                 if response.status == 200:
                     html = await response.text()
                     soup = BeautifulSoup(html, 'html.parser')
-                    
+
                     title_tag = soup.find('title')
                     title = title_tag.get_text(strip=True) if title_tag else "Unknown"
-                    
+
                     for tag in soup(['script', 'style', 'nav', 'footer', 'header']):
                         tag.decompose()
                     text_content = soup.get_text(separator=' ', strip=True)[:2000]
-                    
+
                     images = soup.find_all('img')
                     image_count = len(images)
     except Exception as e:
         text_content = f"Failed to fetch URL: {str(e)}"
-
-    if not models:
-        return demo_analysis('url', language, title, image_count)
 
     prompt = build_url_prompt(url, title, text_content[:1500], image_count, language)
 

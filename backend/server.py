@@ -6,7 +6,6 @@ import os
 import uuid
 from datetime import datetime, timezone
 from dotenv import load_dotenv
-from motor.motor_asyncio import AsyncIOMotorClient
 
 load_dotenv()
 
@@ -21,13 +20,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# MongoDB
-MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+MONGO_URL = os.environ.get('MONGO_URL')
 DB_NAME = os.environ.get('DB_NAME', 'deepguard')
-client = AsyncIOMotorClient(MONGO_URL)
-db = client[DB_NAME]
-analyses_collection = db['analyses']
-contact_collection = db['contacts']
+analyses_collection = None
+contact_collection = None
+if MONGO_URL:
+    from motor.motor_asyncio import AsyncIOMotorClient
+
+    client = AsyncIOMotorClient(MONGO_URL, serverSelectionTimeoutMS=1200)
+    db = client[DB_NAME]
+    analyses_collection = db['analyses']
+    contact_collection = db['contacts']
+memory_analyses = []
+memory_contacts = []
 
 
 def serialize_doc(doc):
@@ -47,6 +52,139 @@ def serialize_doc(doc):
         else:
             result[key] = value
     return result
+
+
+async def save_analysis(doc):
+    if analyses_collection is None:
+        memory_analyses.append(doc.copy())
+        return
+
+    try:
+        await analyses_collection.insert_one(doc)
+    except Exception:
+        memory_analyses.append(doc.copy())
+
+
+async def save_contact(doc):
+    if contact_collection is None:
+        memory_contacts.append(doc.copy())
+        return
+
+    try:
+        await contact_collection.insert_one(doc)
+    except Exception:
+        memory_contacts.append(doc.copy())
+
+
+async def find_recent_analyses(limit: int = 50, analysis_type: Optional[str] = None):
+    query = {}
+    if analysis_type and analysis_type != 'all':
+        query['analysis_type'] = analysis_type
+
+    if analyses_collection is not None:
+        try:
+            cursor = analyses_collection.find(query).sort('created_at', -1).limit(limit)
+            analyses = []
+            async for doc in cursor:
+                analyses.append(serialize_doc(doc))
+            return analyses
+        except Exception:
+            pass
+
+    analyses = [
+        serialize_doc(doc)
+        for doc in memory_analyses
+        if not query or doc.get('analysis_type') == query.get('analysis_type')
+    ]
+    return sorted(
+        analyses,
+        key=lambda item: item.get('created_at', ''),
+        reverse=True,
+    )[:limit]
+
+
+async def find_analysis_by_public_id(public_id: str):
+    if analyses_collection is not None:
+        try:
+            doc = await analyses_collection.find_one({"public_id": public_id})
+            return serialize_doc(doc)
+        except Exception:
+            pass
+
+    for doc in memory_analyses:
+        if doc.get('public_id') == public_id:
+            return serialize_doc(doc)
+    return None
+
+
+async def calculate_stats():
+    if analyses_collection is not None:
+        try:
+            total = await analyses_collection.count_documents({})
+            pipeline = [
+                {"$group": {
+                    "_id": None,
+                    "avg_score": {"$avg": "$trust_score"},
+                    "flagged": {"$sum": {"$cond": [{"$lt": ["$trust_score", 50]}, 1, 0]}}
+                }}
+            ]
+            stats_result = await analyses_collection.aggregate(pipeline).to_list(1)
+
+            avg_score = 0
+            flagged = 0
+            if stats_result:
+                avg_score = round(stats_result[0].get('avg_score', 0) or 0, 1)
+                flagged = stats_result[0].get('flagged', 0)
+
+            type_pipeline = [
+                {"$group": {"_id": "$analysis_type", "count": {"$sum": 1}}}
+            ]
+            type_result = await analyses_collection.aggregate(type_pipeline).to_list(10)
+            type_dist = {item['_id']: item['count'] for item in type_result if item['_id']}
+
+            verdict_pipeline = [
+                {"$group": {"_id": "$verdict", "count": {"$sum": 1}}}
+            ]
+            verdict_result = await analyses_collection.aggregate(verdict_pipeline).to_list(10)
+            verdict_dist = {item['_id']: item['count'] for item in verdict_result if item['_id']}
+
+            recent_cursor = analyses_collection.find(
+                {},
+                {"trust_score": 1, "created_at": 1, "analysis_type": 1}
+            ).sort('created_at', -1).limit(20)
+            recent_scores = []
+            async for doc in recent_cursor:
+                recent_scores.append({
+                    "score": doc.get('trust_score', 0),
+                    "date": doc.get('created_at', datetime.now(timezone.utc)).isoformat() if isinstance(doc.get('created_at'), datetime) else str(doc.get('created_at', '')),
+                    "type": doc.get('analysis_type', '')
+                })
+
+            return total, avg_score, flagged, type_dist, verdict_dist, list(reversed(recent_scores))
+        except Exception:
+            pass
+
+    total = len(memory_analyses)
+    avg_score = round(sum(doc.get('trust_score', 0) for doc in memory_analyses) / total, 1) if total else 0
+    flagged = sum(1 for doc in memory_analyses if doc.get('trust_score', 0) < 50)
+    type_dist = {}
+    verdict_dist = {}
+    recent_scores = []
+    for doc in memory_analyses:
+        analysis_type = doc.get('analysis_type', '')
+        verdict = doc.get('verdict', '')
+        if analysis_type:
+            type_dist[analysis_type] = type_dist.get(analysis_type, 0) + 1
+        if verdict:
+            verdict_dist[verdict] = verdict_dist.get(verdict, 0) + 1
+    for doc in sorted(memory_analyses, key=lambda item: item.get('created_at', ''), reverse=True)[:20]:
+        created_at = doc.get('created_at', datetime.now(timezone.utc))
+        recent_scores.append({
+            "score": doc.get('trust_score', 0),
+            "date": created_at.isoformat() if isinstance(created_at, datetime) else str(created_at),
+            "type": doc.get('analysis_type', '')
+        })
+    return total, avg_score, flagged, type_dist, verdict_dist, list(reversed(recent_scores))
 
 
 class URLAnalysisRequest(BaseModel):
@@ -108,7 +246,7 @@ async def analyze_image_endpoint(
             "language": language,
             "created_at": datetime.now(timezone.utc)
         }
-        await analyses_collection.insert_one(analysis_doc)
+        await save_analysis(analysis_doc)
         
         return serialize_doc(analysis_doc)
     except Exception as e:
@@ -154,7 +292,7 @@ async def analyze_audio_endpoint(
             "language": language,
             "created_at": datetime.now(timezone.utc)
         }
-        await analyses_collection.insert_one(analysis_doc)
+        await save_analysis(analysis_doc)
         
         return serialize_doc(analysis_doc)
     except Exception as e:
@@ -190,7 +328,7 @@ async def analyze_url_endpoint(request: URLAnalysisRequest):
             "language": request.language or 'en',
             "created_at": datetime.now(timezone.utc)
         }
-        await analyses_collection.insert_one(analysis_doc)
+        await save_analysis(analysis_doc)
         
         return serialize_doc(analysis_doc)
     except Exception as e:
@@ -200,71 +338,22 @@ async def analyze_url_endpoint(request: URLAnalysisRequest):
 @app.get("/api/analyses/recent")
 async def get_recent_analyses(limit: int = 50, analysis_type: Optional[str] = None):
     """Get recent analyses"""
-    query = {}
-    if analysis_type and analysis_type != 'all':
-        query['analysis_type'] = analysis_type
-    
-    cursor = analyses_collection.find(query).sort('created_at', -1).limit(limit)
-    analyses = []
-    async for doc in cursor:
-        analyses.append(serialize_doc(doc))
-    
-    return {"analyses": analyses}
+    return {"analyses": await find_recent_analyses(limit, analysis_type)}
 
 
 @app.get("/api/analyses/{public_id}")
 async def get_analysis(public_id: str):
     """Get a specific analysis by public ID"""
-    doc = await analyses_collection.find_one({"public_id": public_id})
+    doc = await find_analysis_by_public_id(public_id)
     if not doc:
         raise HTTPException(status_code=404, detail="Analysis not found")
-    return serialize_doc(doc)
+    return doc
 
 
 @app.get("/api/stats")
 async def get_stats():
     """Get analysis statistics"""
-    total = await analyses_collection.count_documents({})
-    
-    # Average trust score
-    pipeline = [
-        {"$group": {
-            "_id": None,
-            "avg_score": {"$avg": "$trust_score"},
-            "flagged": {"$sum": {"$cond": [{"$lt": ["$trust_score", 50]}, 1, 0]}}
-        }}
-    ]
-    stats_result = await analyses_collection.aggregate(pipeline).to_list(1)
-    
-    avg_score = 0
-    flagged = 0
-    if stats_result:
-        avg_score = round(stats_result[0].get('avg_score', 0) or 0, 1)
-        flagged = stats_result[0].get('flagged', 0)
-    
-    # Type distribution
-    type_pipeline = [
-        {"$group": {"_id": "$analysis_type", "count": {"$sum": 1}}}
-    ]
-    type_result = await analyses_collection.aggregate(type_pipeline).to_list(10)
-    type_dist = {item['_id']: item['count'] for item in type_result if item['_id']}
-    
-    # Verdict distribution
-    verdict_pipeline = [
-        {"$group": {"_id": "$verdict", "count": {"$sum": 1}}}
-    ]
-    verdict_result = await analyses_collection.aggregate(verdict_pipeline).to_list(10)
-    verdict_dist = {item['_id']: item['count'] for item in verdict_result if item['_id']}
-    
-    # Recent scores for chart
-    recent_cursor = analyses_collection.find({}, {"trust_score": 1, "created_at": 1, "analysis_type": 1}).sort('created_at', -1).limit(20)
-    recent_scores = []
-    async for doc in recent_cursor:
-        recent_scores.append({
-            "score": doc.get('trust_score', 0),
-            "date": doc.get('created_at', datetime.now(timezone.utc)).isoformat() if isinstance(doc.get('created_at'), datetime) else str(doc.get('created_at', '')),
-            "type": doc.get('analysis_type', '')
-        })
+    total, avg_score, flagged, type_dist, verdict_dist, recent_scores = await calculate_stats()
     
     return {
         "total": total,
@@ -286,7 +375,7 @@ async def submit_contact(request: ContactRequest):
         "message": request.message,
         "created_at": datetime.now(timezone.utc)
     }
-    await contact_collection.insert_one(doc)
+    await save_contact(doc)
     return {"status": "ok", "message": "Contact form submitted successfully"}
 
 
