@@ -1,0 +1,15 @@
+[project]
+name = "deepguard-backend"
+version = "1.0.0"
+requires-python = ">=3.11"
+dependencies = [
+  "aiohttp==3.13.5",
+  "beautifulsoup4==4.14.3",
+  "fastapi[standard]==0.115.14",
+  "litellm==1.80.0",
+  "motor==3.7.1",
+  "pydantic==2.12.5",
+  "python-dotenv==1.2.2",
+  "python-multipart==0.0.24",
+  "uvicorn==0.25.0",
+]
