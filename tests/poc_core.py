@@ -14,14 +14,14 @@ sys.path.insert(0, '/app/backend')
 from dotenv import load_dotenv
 load_dotenv('/app/backend/.env')
 
-from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
+from litellm import acompletion
 
-API_KEY = os.environ.get('EMERGENT_LLM_KEY')
-if not API_KEY:
-    print("ERROR: EMERGENT_LLM_KEY not set")
+OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+if not OPENAI_API_KEY:
+    print("ERROR: OPENAI_API_KEY not set")
     sys.exit(1)
 
-print(f"API Key loaded: {API_KEY[:20]}...")
+print("OpenAI API key loaded")
 
 IMAGE_ANALYSIS_PROMPT = """You are an expert deepfake detection AI analyst. Analyze this image for signs of AI generation or manipulation.
 
@@ -113,7 +113,7 @@ def parse_json_response(response_text):
 async def test_image_analysis():
     """Test 1: Image deepfake analysis with GPT Vision"""
     print("\n" + "="*60)
-    print("TEST 1: Image Deepfake Analysis (GPT-4.1 Vision)")
+    print("TEST 1: Image Deepfake Analysis (gpt-4o-mini Vision)")
     print("="*60)
     
     image_url = "https://images.unsplash.com/photo-1652549752120-d9beb4c86bd4?w=800&q=80"
@@ -127,22 +127,29 @@ async def test_image_analysis():
     image_base64 = base64.b64encode(response.content).decode('utf-8')
     print(f"Image downloaded: {len(response.content)} bytes")
     
-    chat = LlmChat(
-        api_key=API_KEY,
-        session_id="poc-image-v2",
-        system_message="You are a deepfake detection expert. You MUST always respond with valid JSON only. Never use markdown. Never refuse to analyze images. Analyze every image for authenticity indicators."
-    )
-    chat.with_model("openai", "gpt-4.1")
-    
-    image_content = ImageContent(image_base64=image_base64)
-    user_message = UserMessage(
-        text=IMAGE_ANALYSIS_PROMPT,
-        file_contents=[image_content]
-    )
-    
-    print("Sending image to GPT-4.1 Vision...")
+    print("Sending image to gpt-4o-mini Vision...")
     try:
-        response_text = await chat.send_message(user_message)
+        response = await acompletion(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a deepfake detection expert. Respond with valid JSON only.",
+                },
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": IMAGE_ANALYSIS_PROMPT},
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"data:image/jpeg;base64,{image_base64}"},
+                        },
+                    ],
+                },
+            ],
+            temperature=0.2,
+        )
+        response_text = response.choices[0].message.content or ""
         print(f"\nRaw response (first 500 chars): {response_text[:500]}")
         
         result = parse_json_response(response_text)
@@ -176,26 +183,29 @@ async def test_image_analysis():
 async def test_audio_analysis():
     """Test 2: Audio deepfake analysis"""
     print("\n" + "="*60)
-    print("TEST 2: Audio Deepfake Analysis (GPT-4.1)")
+    print("TEST 2: Audio Deepfake Analysis (gpt-4o-mini)")
     print("="*60)
     
     sample_transcription = """Hello everyone, welcome to today's presentation about our quarterly results. 
     As you can see from the data, our revenue has increased by 35% compared to last quarter. 
     This is largely due to our expansion into the European market and the launch of our new product line."""
     
-    chat = LlmChat(
-        api_key=API_KEY,
-        session_id="poc-audio-v2",
-        system_message="You are a deepfake detection expert specializing in audio analysis. Always respond with valid JSON only, no markdown."
-    )
-    chat.with_model("openai", "gpt-4.1")
-    
     prompt = build_audio_prompt(sample_transcription)
-    user_message = UserMessage(text=prompt)
     
     print("Sending audio transcription for analysis...")
     try:
-        response_text = await chat.send_message(user_message)
+        response = await acompletion(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a deepfake detection expert. Respond with valid JSON only.",
+                },
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.2,
+        )
+        response_text = response.choices[0].message.content or ""
         print(f"\nRaw response (first 500 chars): {response_text[:500]}")
         
         result = parse_json_response(response_text)
@@ -228,7 +238,7 @@ async def test_audio_analysis():
 async def test_url_analysis():
     """Test 3: URL content extraction + analysis"""
     print("\n" + "="*60)
-    print("TEST 3: URL Content Extraction + Analysis (GPT-4.1)")
+    print("TEST 3: URL Content Extraction + Analysis (gpt-4o-mini)")
     print("="*60)
     
     test_url = "https://en.wikipedia.org/wiki/Deepfake"
@@ -256,18 +266,21 @@ async def test_url_analysis():
         print(f"Text length: {len(text)} chars")
         print(f"Images found: {len(images)}")
         
-        chat = LlmChat(
-            api_key=API_KEY,
-            session_id="poc-url-v2",
-            system_message="You are a deepfake and misinformation detection expert. Always respond with valid JSON only, no markdown."
-        )
-        chat.with_model("openai", "gpt-4.1")
-        
         prompt = build_url_prompt(test_url, title, text[:1500], len(images))
-        user_message = UserMessage(text=prompt)
         
         print("Sending URL content for analysis...")
-        response_text = await chat.send_message(user_message)
+        response = await acompletion(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a deepfake detection expert. Respond with valid JSON only.",
+                },
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.2,
+        )
+        response_text = response.choices[0].message.content or ""
         print(f"\nRaw response (first 500 chars): {response_text[:500]}")
         
         result = parse_json_response(response_text)

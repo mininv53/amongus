@@ -6,7 +6,7 @@ export const Footer = () => {
   const { t } = useLanguage();
 
   return (
-    <footer className="border-t border-border bg-card/50" data-testid="footer">
+    <footer className="border-t border-white/10 bg-card/50" data-testid="footer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-10">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           {/* Brand */}
@@ -17,7 +17,7 @@ export const Footer = () => {
                 alt="DeepGuard"
                 className="w-8 h-8 rounded-lg object-cover"
               />
-              <span className="font-semibold font-['Space_Grotesk']">DeepGuard</span>
+              <span className="font-semibold">DeepGuard</span>
             </div>
             <p className="text-sm text-muted-foreground">{t('footer_tagline')}</p>
           </div>
@@ -30,7 +30,7 @@ export const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-6 pt-4 border-t border-border">
+        <div className="mt-6 pt-4 border-t border-white/10">
           <p className="text-xs text-muted-foreground text-center">
             &copy; {new Date().getFullYear()} DeepGuard
           </p>

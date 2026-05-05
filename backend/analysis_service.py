@@ -5,19 +5,42 @@ import base64
 import asyncio
 import aiohttp
 from bs4 import BeautifulSoup
-from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
+from litellm import acompletion
 from dotenv import load_dotenv
 
 load_dotenv()
 
-API_KEY = os.environ.get('EMERGENT_LLM_KEY', '')
+if not os.environ.get("GEMINI_API_KEY") and os.environ.get("GOOGLE_API_KEY"):
+    os.environ["GEMINI_API_KEY"] = os.environ["GOOGLE_API_KEY"]
 
-# Multi-model configuration
-MODELS = [
-    {"provider": "openai", "model": "gpt-5.1", "label": "GPT-5.1"},
-    {"provider": "anthropic", "model": "claude-sonnet-4-5-20250929", "label": "Claude Sonnet 4.5"},
-    {"provider": "gemini", "model": "gemini-2.5-pro", "label": "Gemini 2.5 Pro"},
+MODEL_CATALOG = [
+    {
+        "provider": "openai",
+        "model": "gpt-4o-mini",
+        "label": "OpenAI vision model",
+        "env_keys": ["OPENAI_API_KEY"],
+    },
+    {
+        "provider": "anthropic",
+        "model": "anthropic/claude-3-5-sonnet-latest",
+        "label": "Claude review model",
+        "env_keys": ["ANTHROPIC_API_KEY"],
+    },
+    {
+        "provider": "gemini",
+        "model": "gemini/gemini-1.5-flash",
+        "label": "Gemini review model",
+        "env_keys": ["GEMINI_API_KEY", "GOOGLE_API_KEY"],
+    },
 ]
+
+
+def configured_models():
+    return [
+        model
+        for model in MODEL_CATALOG
+        if any(os.environ.get(env_key) for env_key in model["env_keys"])
+    ]
 
 
 def parse_json_response(response_text):
@@ -127,22 +150,31 @@ summary: 2-3 sentence assessment
 recommendations: array of 1-3 action items"""
 
 
-async def run_single_model(provider, model_name, label, prompt, image_content=None):
+async def run_single_model(provider, model_name, label, prompt, image_base64=None):
     """Run analysis on a single model"""
     try:
-        chat = LlmChat(
-            api_key=API_KEY,
-            session_id=f"analysis-{provider}-{os.urandom(4).hex()}",
-            system_message="You are a deepfake detection expert. You MUST always respond with valid JSON only. Never use markdown."
+        content = prompt
+        if image_base64:
+            content = [
+                {"type": "text", "text": prompt},
+                {
+                    "type": "image_url",
+                    "image_url": {"url": f"data:image/jpeg;base64,{image_base64}"},
+                },
+            ]
+
+        response = await acompletion(
+            model=model_name,
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a deepfake detection expert. Respond with valid JSON only.",
+                },
+                {"role": "user", "content": content},
+            ],
+            temperature=0.2,
         )
-        chat.with_model(provider, model_name)
-
-        if image_content:
-            msg = UserMessage(text=prompt, file_contents=[image_content])
-        else:
-            msg = UserMessage(text=prompt)
-
-        response_text = await chat.send_message(msg)
+        response_text = response.choices[0].message.content or ""
         result = parse_json_response(response_text)
         return {
             "provider": provider,
@@ -164,6 +196,70 @@ async def run_single_model(provider, model_name, label, prompt, image_content=No
             "error": str(e),
             "success": False
         }
+
+
+def demo_analysis(analysis_type, language='en', url_title=None, url_images=0):
+    is_ru = language == 'ru'
+    is_ro = language == 'ro'
+    if is_ru:
+        summary = "Демо-отчёт: backend не подключён к рабочему LLM-ключу, поэтому показан пример результата. Для реальной проверки добавьте один из ключей: OPENAI_API_KEY, ANTHROPIC_API_KEY или GEMINI_API_KEY."
+        recommendations = [
+            "Подключите backend URL и LLM API key для реального анализа.",
+            "Проверяйте важные материалы по оригинальному источнику.",
+        ]
+        signals = [
+            {"signal": "Демо-режим", "impact": "neutral", "detail": "Результат показывает формат отчёта, а не реальную экспертизу файла."},
+            {"signal": "Backend/API key", "impact": "neutral", "detail": "Нужен запущенный FastAPI backend с одним из поддерживаемых ключей."},
+        ]
+    elif is_ro:
+        summary = "Raport demo: backend-ul nu are o cheie LLM activă, așa că este afișat un exemplu de rezultat. Pentru analiză reală, adaugă OPENAI_API_KEY, ANTHROPIC_API_KEY sau GEMINI_API_KEY."
+        recommendations = [
+            "Conectează backend URL și un LLM API key pentru analiză reală.",
+            "Verifică materialele importante cu sursa originală.",
+        ]
+        signals = [
+            {"signal": "Mod demo", "impact": "neutral", "detail": "Rezultatul arată formatul raportului, nu o expertiză reală."},
+            {"signal": "Backend/API key", "impact": "neutral", "detail": "Este necesar un backend FastAPI pornit cu una dintre cheile acceptate."},
+        ]
+    else:
+        summary = "Demo report: the backend has no active LLM key, so this is a sample result. For real checks, add OPENAI_API_KEY, ANTHROPIC_API_KEY, or GEMINI_API_KEY."
+        recommendations = [
+            "Connect a backend URL and LLM API key for real analysis.",
+            "Confirm high-stakes media with the original source.",
+        ]
+        signals = [
+            {"signal": "Demo mode", "impact": "neutral", "detail": "This shows the report format, not a real forensic read."},
+            {"signal": "Backend/API key", "impact": "neutral", "detail": "A running FastAPI backend with a supported key is required for live analysis."},
+        ]
+
+    return {
+        "trust_score": 50,
+        "verdict": "UNCERTAIN",
+        "confidence": 0.35,
+        "top_signals": signals,
+        "summary": summary,
+        "recommendations": recommendations,
+        "model_results": [
+            {
+                "provider": "demo",
+                "model": "local-demo",
+                "label": "Demo report",
+                "trust_score": 50,
+                "verdict": "UNCERTAIN",
+                "confidence": 0.35,
+                "top_signals": signals,
+                "summary": summary,
+                "recommendations": recommendations,
+                "success": True,
+            }
+        ],
+        "models_used": 0,
+        "models_total": 0,
+        "consensus_strength": "demo",
+        "analysis_type": analysis_type,
+        "url_title": url_title,
+        "url_images": url_images,
+    }
 
 
 def aggregate_results(model_results):
@@ -246,14 +342,17 @@ def aggregate_results(model_results):
 
 async def analyze_image(image_bytes: bytes, language: str = 'en') -> dict:
     """Multi-model image deepfake analysis"""
+    models = configured_models()
+    if not models:
+        return demo_analysis('image', language)
+
     image_base64 = base64.b64encode(image_bytes).decode('utf-8')
     prompt = build_image_prompt(language)
-    image_content = ImageContent(image_base64=image_base64)
 
     # Run all models in parallel
     tasks = [
-        run_single_model(m["provider"], m["model"], m["label"], prompt, image_content)
-        for m in MODELS
+        run_single_model(m["provider"], m["model"], m["label"], prompt, image_base64)
+        for m in models
     ]
     model_results = await asyncio.gather(*tasks)
     
@@ -264,12 +363,16 @@ async def analyze_image(image_bytes: bytes, language: str = 'en') -> dict:
 
 async def analyze_audio(audio_bytes: bytes, filename: str, language: str = 'en') -> dict:
     """Multi-model audio deepfake analysis"""
+    models = configured_models()
+    if not models:
+        return demo_analysis('audio', language)
+
     file_size_kb = len(audio_bytes) / 1024
     prompt = build_audio_prompt(filename, file_size_kb, language)
 
     tasks = [
         run_single_model(m["provider"], m["model"], m["label"], prompt)
-        for m in MODELS
+        for m in models
     ]
     model_results = await asyncio.gather(*tasks)
     
@@ -280,6 +383,7 @@ async def analyze_audio(audio_bytes: bytes, filename: str, language: str = 'en')
 
 async def analyze_url(url: str, language: str = 'en') -> dict:
     """Multi-model URL/content analysis"""
+    models = configured_models()
     # Fetch URL content
     title = "Unknown"
     text_content = ""
@@ -305,11 +409,14 @@ async def analyze_url(url: str, language: str = 'en') -> dict:
     except Exception as e:
         text_content = f"Failed to fetch URL: {str(e)}"
 
+    if not models:
+        return demo_analysis('url', language, title, image_count)
+
     prompt = build_url_prompt(url, title, text_content[:1500], image_count, language)
 
     tasks = [
         run_single_model(m["provider"], m["model"], m["label"], prompt)
-        for m in MODELS
+        for m in models
     ]
     model_results = await asyncio.gather(*tasks)
     
